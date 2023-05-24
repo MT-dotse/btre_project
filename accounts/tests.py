@@ -26,8 +26,8 @@ class AccountsTestCase(TestCase):
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(User.objects.first().username, "janedoe")
 
-    def test_register_existing_username2(self):
-        # Test registering with an existing username
+    def test_register_existing_username_redirect2(self):
+        # Test registering with an existing username and redirecting status code from 302 to 200
         User.objects.create_user(username="janedoe", password="password123")
         response = self.client.post(
             reverse("register"),
@@ -40,12 +40,31 @@ class AccountsTestCase(TestCase):
                 "password2": "password123",
             },
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("register"))
+
+        self.assertRedirects(
+            response, reverse("register"), status_code=302, target_status_code=200
+        )
+
+    def test_register_existing_username_messages2(self):
+        # Test registering with an existing username and a response message
+        User.objects.create_user(username="janedoe", password="password123")
+        response = self.client.post(
+            reverse("register"),
+            {
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "username": "janedoe",
+                "email": "janedoe@example.com",
+                "password": "password123",
+                "password2": "password123",
+            },
+            follow=True,
+        )
+        print(response.context["messages"])
         self.assertContains(response, "That username is taken")
 
-    def test_register_existing_email3(self):
-        # Test registering with an existing email
+    def test_register_existing_email_redirect3(self):
+        # Test registering with an existing email and redirecting status code from 302 to 200
         User.objects.create_user(
             username="existinguser", password="password123", email="janedoe@example.com"
         )
@@ -60,12 +79,32 @@ class AccountsTestCase(TestCase):
                 "password2": "password123",
             },
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("register"))
+        self.assertRedirects(
+            response, reverse("register"), status_code=302, target_status_code=200
+        )
+
+    def test_register_existing_email_messages(self):
+        # Test registering with an existing email and a response message
+        User.objects.create_user(
+            username="existinguser", password="password123", email="janedoe@example.com"
+        )
+        response = self.client.post(
+            reverse("register"),
+            {
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "username": "janedoe",
+                "email": "janedoe@example.com",
+                "password": "password123",
+                "password2": "password123",
+            },
+            follow=True,
+        )
+        print(response.context["messages"])
         self.assertContains(response, "That email is being used")
 
-    def test_register_password_mismatch4(self):
-        # Test registering with mismatched passwords
+    def test_register_password_mismatch_redirect4(self):
+        # Test registering with mismatched passwords and redirecting status code from 302 to 200
         response = self.client.post(
             reverse("register"),
             {
@@ -77,8 +116,26 @@ class AccountsTestCase(TestCase):
                 "password2": "mismatchedpassword",
             },
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("register"), target_status_code=200)
+        self.assertRedirects(
+            response, reverse("register"), status_code=302, target_status_code=200
+        )
+
+    def test_register_password_mismatch_messages(self):
+        # Test registering with mismatched passwords and a response message
+        response = self.client.post(
+            reverse("register"),
+            {
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "username": "janedoe",
+                "email": "janedoe@example.com",
+                "password": "password123",
+                "password2": "mismatchedpassword",
+            },
+            follow=True,
+        )
+
+        print(response.context["messages"])
         self.assertContains(response, "Passwords do not match")
 
     def test_login_valid_credentials5(self):
