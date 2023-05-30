@@ -145,6 +145,8 @@ from django.contrib.messages import constants as messages
 
 MESSAGE_TAGS = {messages.ERROR: "danger"}
 
+MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
+
 # Email config
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
