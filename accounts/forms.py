@@ -1,29 +1,23 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from .models import RegisterUserModel
-
 
 # Create a form class
-class RegisterUserForm(forms.ModelForm):
+class RegisterForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    password2 = forms.CharField(widget=forms.PasswordInput())
+    email = forms.CharField(widget=forms.EmailInput())
+
     class Meta:
-        model = RegisterUserModel
+        model = User
         fields = [
-            "username",
             "first_name",
             "last_name",
             "email",
+            "username",
+            "password",
+            "password2",
         ]
-        widgets = {
-            "password": forms.PasswordInput(),
-            "password2": forms.PasswordInput(),
-        }
-
-    def clean_password2(self):
-        password = self.cleaned_data["password"]
-        password2 = self.cleaned_data["password2"]
-        if password != password2:
-            raise forms.ValidationError("Password do not match")
 
     def clean_username(self):
         username = self.cleaned_data["username"]
@@ -36,6 +30,12 @@ class RegisterUserForm(forms.ModelForm):
             if User.objects.filter(email=email).exists():
                 raise forms.ValidationError("That email is being used")
 
+    def clean_password2(self):
+        password = self.cleaned_data["password"]
+        password2 = self.cleaned_data["password2"]
+        if password != password2:
+            raise forms.ValidationError("Password do not match")
+
 
 # Creating a form to add a user
-form = RegisterUserForm()
+form = RegisterForm()

@@ -7,16 +7,14 @@ from django.shortcuts import redirect, render
 
 from contacts.models import Contact
 
-from .forms import RegisterUserForm
-
-# from django.contrib.auth import authenticate, login
+from .forms import RegisterForm
 
 
 # View methods
 def register(request):
     if request.method == "POST":
         # Create object of form
-        form = RegisterUserForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "You are now registered and can log in")
@@ -24,7 +22,9 @@ def register(request):
         else:
             return redirect("register")
     else:
-        return render(request, "accounts/register.html")
+        form = RegisterForm()
+        context = {"form": form}
+        return render(request, "accounts/register.html", context)
 
 
 def login(request):
