@@ -15,10 +15,13 @@
             <div class="card-body">
             <!-- Alerts -->
             {% include 'partials/_alerts.html' %}
+            {{form.errors}}
             <form action="{% url 'register' %}" method="POST">
                     {% csrf_token %}
+                    <table>
                     {{form.as_p}}
                 <input type="submit" value="Register" class="btn btn-secondary btn-block">
+              </table>
               </form>
             </div>
           </div>
@@ -27,3 +30,15 @@
     </div>
   </section>
   {% endblock %}
+
+  <!-- {% for field in form %}
+  <p> {% if field.errors %}
+    <ul class="errorlist">
+      {% for error in field.errors %}
+      <li>{error}</li>
+      {% endfor %}
+    </ul>
+      {% endif %}
+    {{ field.label_tag}} {{ field}}
+  </p>
+  {% endfor %} -->

@@ -1,8 +1,12 @@
 import email
+from math import log
 
 from django.contrib import auth, messages
+from django.contrib.auth import forms
+from django.contrib.auth.decorators import login_required
 
 # from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
 
 from contacts.models import Contact
@@ -20,7 +24,10 @@ def register(request):
             messages.success(request, "You are now registered and can log in")
             return redirect("login")
         else:
-            return redirect("register")
+            print(form.errors)
+            messages.error(request, "Please correct error in form")
+            context = {"form": form}
+            return render(request, "accounts/register.html", context)
     else:
         form = RegisterForm()
         context = {"form": form}
@@ -54,6 +61,7 @@ def logout(request):
         return redirect("index")
 
 
+@login_required
 def dashboard(request):
     user_contacts = Contact.objects.order_by("-contact_date").filter(
         user_id=request.user.id
